@@ -6,35 +6,49 @@ class To5374areadaysCSV
   FAMILY_GTYPES = ["不燃", "可燃", "リプラ", "他プラ", "資源"].freeze
 
   def generate
-    areas = load_areas
     if File.exist?('output')
       Dir.mkdir('output')
     end
+    areas = load_areas
+    rows = create_csv(areas)
+
     output_file = CSV.open('output/area_day.csv', 'w') do |csv|
       csv << area_days_headers
-      areas.each do |area|
-        gabage_table = load_gabage_table(area)
-        big_gabage_table = load_big_gabage_table(area)
-        wards = load_wards(area)
-        wards.each do |ward|
-          row = table[ward]
-          csv << row
-        end
+      rows.each do |row|
+        csv << row
       end
     end
   end
 
   def load_areas
-    ["中区"]
+    ['中区', '佐伯区', '南区', '安佐北区', '安佐南区', '安芸区', '東区', '西区']
   end
 
-  def load_gabage_table(area)
-    filename = "resource/2016/1家庭ゴミ収集日（#{area}）.csv"
+  def create_csv(areas)
+    year = 2016
+    rows = []
+    areas.each do |area|
+      gabage_table = load_gabage_table(area, year)
+      big_gabage_table = load_big_gabage_table(area, year)
+      wards = load_wards(area, year)
+      wards.each do |ward|
+        key = ward["グループ"]
+        row = gabage_table[key]
+        table = Hash[row.merge(big_gabage_table[key]).map { |k,v| [k, v.join(" ")] }]
+        w = ward["町名"]
+        rows << ["#{area} #{w}", "", table["可燃"], table["リプラ"], table["リプラ"], table["資源"], table["資源"], table["他プラ"]]
+      end
+    end
+    rows
+  end
+
+  def load_gabage_table(area, year)
+    filename = "resource/#{year}/1家庭ゴミ収集日（#{area}）.csv"
     load_table_base(area, filename, FAMILY_GTYPES)
   end
 
-  def load_big_gabage_table(area)
-    filename = "resource/2016/2大型ゴミ収集日（#{area}）.csv"
+  def load_big_gabage_table(area, year)
+    filename = "resource/#{year}/2大型ゴミ収集日（#{area}）.csv"
     load_table_base(area, filename, ["大型"])
   end
 
@@ -55,6 +69,11 @@ class To5374areadaysCSV
       end
     end
     hash
+  end
+
+  def load_wards(area, year)
+    filename = "resource/#{year}/3#{area}町名.csv"
+    CSV.read(filename, encoding: 'Shift_JIS:UTF-8', headers: :first_row)
   end
 
   def area_days_headers
