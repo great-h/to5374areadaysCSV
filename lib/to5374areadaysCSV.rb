@@ -3,6 +3,8 @@ require "to5374areadaysCSV/version"
 require 'csv'
 
 class To5374areadaysCSV
+  FAMILY_GTYPES = ["不燃", "可燃", "リプラ", "他プラ", "資源"].freeze
+
   def generate
     areas = load_areas
     if File.exist?('output')
@@ -36,6 +38,7 @@ class To5374areadaysCSV
         gtype = row[key]
         group = hash.fetch(key, {})
         if gtype != nil
+          raise "no support gtypes: #{gtype}" unless FAMILY_GTYPES.include? gtype
           g_dates = group.fetch(gtype, [])
           g_dates << date.strftime("%Y%m%d")
           group[gtype] = g_dates
