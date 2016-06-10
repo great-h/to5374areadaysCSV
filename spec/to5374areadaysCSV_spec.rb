@@ -20,5 +20,6 @@ describe To5374areadaysCSV do
 
   it 'create_csv' do
     rows = To5374areadaysCSV.new.create_csv(['中区'])
+    expect(rows[0].count).to eq(10)
   end
 end

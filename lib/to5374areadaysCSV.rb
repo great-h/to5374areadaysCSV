@@ -6,13 +6,13 @@ class To5374areadaysCSV
   FAMILY_GTYPES = ["不燃", "可燃", "リプラ", "他プラ", "資源"].freeze
 
   def generate
-    if File.exist?('output')
+    unless File.exist?('output')
       Dir.mkdir('output')
     end
     areas = load_areas
     rows = create_csv(areas)
 
-    output_file = CSV.open('output/area_day.csv', 'w') do |csv|
+    output_file = CSV.open('output/area_days.csv', 'w') do |csv|
       csv << area_days_headers
       rows.each do |row|
         csv << row
@@ -36,7 +36,7 @@ class To5374areadaysCSV
         row = gabage_table[key]
         table = Hash[row.merge(big_gabage_table[key]).map { |k,v| [k, v.join(" ")] }]
         w = ward["町名"]
-        rows << ["#{area} #{w}", "", table["可燃"], table["リプラ"], table["リプラ"], table["資源"], table["資源"], table["他プラ"]]
+        rows << ["#{area} #{w}", "", table["可燃"], table["リプラ"], table["リプラ"], table["資源"], table["資源"], table["他プラ"], table["大型"] + "*1", table["不燃"]]
       end
     end
     rows

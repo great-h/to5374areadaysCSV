@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+$:.unshift File.join(File.dirname(__FILE__),'..', 'lib')
+
+require 'to5374areadaysCSV'
+
+To5374areadaysCSV.new.generate
