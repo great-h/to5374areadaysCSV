@@ -1,41 +1,22 @@
 # To5374areadaysCSV
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/to5374areadaysCSV`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'to5374areadaysCSV'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install to5374areadaysCSV
+広島市の家庭ごみの収集日のデータから[5374.j4　広島版](hiroshima.5374.jp)で利用可能なデータを構築するスクリプトです。
 
 ## Usage
 
-TODO: Write usage instructions here
+本リポジトリをcloneして
 
-## Development
+```
+$ bundle install
+$ bin/createAreaCSV
+```
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
-
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
-
-## Contributing
-
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/to5374areadaysCSV.
-
+とすることで`output`ディレクトリにarea_days.csvが生成されます
 
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
 
+本リポジトリには「広島市 環境局業務部業務第一課」が公開している「[平成２８年度家庭ゴミ収集日程表](http://www.city.hiroshima.lg.jp/www/opendatamain/contents/1464164589110/index.html)」のデータを含んでいます。
+
+[![ccby](http://www.city.hiroshima.lg.jp/www/image/opendata/ccby.png)](http://creativecommons.org/licenses/by/4.0/deed.ja)
