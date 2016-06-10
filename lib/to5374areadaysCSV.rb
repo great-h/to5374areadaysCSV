@@ -35,8 +35,9 @@ class To5374areadaysCSV
         key = ward["グループ"]
         row = gabage_table[key]
         table = Hash[row.merge(big_gabage_table[key]).map { |k,v| [k, v.join(" ")] }]
-        w = ward["町名"]
-        rows << ["#{area} #{w}", "", table["可燃"], table["リプラ"], table["リプラ"], table["資源"], table["資源"], table["他プラ"], table["大型"] + "*1", table["不燃"]]
+        w = ward["町名"].gsub(",", "・")
+        y = ward["よみ"]
+        rows << ["#{area} #{w}(#{y})", "", table["可燃"] + " *1", table["リプラ"] + " *2", table["リプラ"] + " *3", table["資源"] + " *4", table["資源"] + " *5", table["他プラ"] + " *6", table["大型"] + " *7", table["不燃"] + " *8"]
       end
     end
     rows
