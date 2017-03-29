@@ -21,11 +21,20 @@ class To5374areadaysCSV
   end
 
   def load_areas
-    ['中区', '佐伯区', '南区', '安佐北区', '安佐南区', '安芸区', '東区', '西区']
+    [
+      { index: 1, name: '中区' },
+      { index: 2, name: '東区' },
+      { index: 3, name: '南区' },
+      { index: 4, name: '西区' },
+      { index: 5, name: '安佐南区' },
+      { index: 6, name: '安佐北区' },
+      { index: 7, name: '安芸区' },
+      { index: 8, name: '佐伯区' }
+    ]
   end
 
   def create_csv(areas)
-    year = 2016
+    year = 2017
     rows = []
     areas.each do |area|
       gabage_table = load_gabage_table(area, year)
@@ -37,19 +46,30 @@ class To5374areadaysCSV
         table = Hash[row.merge(big_gabage_table[key]).map { |k,v| [k, v.join(" ")] }]
         w = ward["町名"].gsub(",", "・")
         y = ward["よみ"]
-        rows << ["#{area} #{w}(#{y})", "", table["可燃"] + " *1", table["リプラ"] + " *2", table["リプラ"] + " *3", table["資源"] + " *4", table["資源"] + " *5", table["他プラ"] + " *6", table["大型"] + " *7", table["不燃"] + " *8"]
+        rows << [
+          "#{area[:name]} #{w}(#{y})",
+          "",
+          table["可燃"] + " *1",
+          table["リプラ"] + " *2",
+          table["リプラ"] + " *3",
+          table["資源"] + " *4",
+          table["資源"] + " *5",
+          table["他プラ"] + " *6",
+          table["大型"] + " *7",
+          table["不燃"] + " *8"
+        ]
       end
     end
     rows
   end
 
   def load_gabage_table(area, year)
-    filename = "resource/#{year}/1家庭ゴミ収集日（#{area}）.csv"
+    filename = "resource/#{year}/1-#{area[:index]}家庭ごみ収集日（#{area[:name]}）.csv"
     load_table_base(area, filename, FAMILY_GTYPES)
   end
 
   def load_big_gabage_table(area, year)
-    filename = "resource/#{year}/2大型ゴミ収集日（#{area}）.csv"
+    filename = "resource/#{year}/2-#{area[:index]}大型ごみ収集日（#{area[:name]}）.csv"
     load_table_base(area, filename, ["大型"])
   end
 
@@ -73,7 +93,7 @@ class To5374areadaysCSV
   end
 
   def load_wards(area, year)
-    filename = "resource/#{year}/3#{area}町名.csv"
+    filename = "resource/#{year}/3-#{area[:index]}#{area[:name]}町名.csv"
     CSV.read(filename, encoding: 'Shift_JIS:UTF-8', headers: :first_row)
   end
 
