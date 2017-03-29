@@ -37,13 +37,13 @@ class To5374areadaysCSV
     year = 2017
     rows = []
     areas.each do |area|
-      gabage_table = load_gabage_table(area, year)
-      big_gabage_table = load_big_gabage_table(area, year)
+      garbage_table = load_garbage_table(area, year)
+      big_garbage_table = load_big_garbage_table(area, year)
       wards = load_wards(area, year)
       wards.each do |ward|
         key = ward["グループ"]
-        row = gabage_table[key]
-        table = Hash[row.merge(big_gabage_table[key]).map { |k,v| [k, v.join(" ")] }]
+        row = garbage_table[key]
+        table = Hash[row.merge(big_garbage_table[key]).map { |k,v| [k, v.join(" ")] }]
         w = ward["町名"].gsub(",", "・")
         y = ward["よみ"]
         rows << [
@@ -63,12 +63,12 @@ class To5374areadaysCSV
     rows
   end
 
-  def load_gabage_table(area, year)
+  def load_garbage_table(area, year)
     filename = "resource/#{year}/1-#{area[:index]}家庭ごみ収集日（#{area[:name]}）.csv"
     load_table_base(area, filename, FAMILY_GTYPES)
   end
 
-  def load_big_gabage_table(area, year)
+  def load_big_garbage_table(area, year)
     filename = "resource/#{year}/2-#{area[:index]}大型ごみ収集日（#{area[:name]}）.csv"
     load_table_base(area, filename, ["大型"])
   end
