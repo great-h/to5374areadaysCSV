@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Tomohiko Himura"]
   spec.email         = ["eiel.hal@gmail.com"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = "generate csv for hiroshima.5374.jp"
+  spec.description   = "generate csv for hiroshima.5374.jp"
+  spec.homepage      = "https://github.com/great-h/to5374areadaysCSV"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org by setting 'allowed_push_host', or
