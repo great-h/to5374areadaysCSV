@@ -1,5 +1,6 @@
 # coding: utf-8
 require 'spec_helper'
+require 'to5374areadaysCSV'
 
 describe To5374areadaysCSV do
   let(:area) { { index: 1, name: '中区' } }
