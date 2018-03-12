@@ -2,6 +2,7 @@
 require 'csv'
 
 module To5374areadaysCSV::GarbageDateLoader
+  module_function
   FAMILY_GTYPES = ["不燃", "可燃", "リプラ", "他プラ", "資源"].freeze
 
   def load_garbage(year, area_index, area_name)

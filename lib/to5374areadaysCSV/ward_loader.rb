@@ -2,6 +2,8 @@
 require 'csv'
 
 module To5374areadaysCSV::WardLoader
+  module_function
+  
   def load(year, area_index, area_name)
     name = filename(year, area_index, area_name)
     CSV.foreach(name, encoding: 'Shift_JIS:UTF-8', headers: :first_row).map do |l|
