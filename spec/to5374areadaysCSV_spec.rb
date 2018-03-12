@@ -23,7 +23,7 @@ describe To5374areadaysCSV do
   end
 
   it '#create_csv' do
-    rows = To5374areadaysCSV.new.create_csv([area], date)
+    rows = To5374areadaysCSV.new.build_csv([area], date)
     expect(rows[0].count).to eq(10)
   end
 end

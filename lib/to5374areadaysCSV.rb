@@ -11,7 +11,7 @@ class To5374areadaysCSV
       Dir.mkdir('output')
     end
     areas = load_areas
-    rows = create_csv(areas, date)
+    rows = build_csv(areas, date)
 
     output_file = CSV.open('output/area_days.csv', 'w') do |csv|
       csv << area_days_headers
@@ -53,7 +53,8 @@ class To5374areadaysCSV
     ]
   end
 
-  def create_csv(areas, date)
+  #　出力するCSVのための二次元配列を作成する
+  def build_csv(areas, date)
     year = date.year
     rows = []
     areas.each do |area|
