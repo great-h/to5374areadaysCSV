@@ -34,6 +34,25 @@ class To5374areadaysCSV
     ]
   end
 
+  # table: あるグループのゴミの日を保持した Hash。キーはゴミの種類 値は日付データ
+  # ward: ある街の上をう表現する Hash
+  def build_csv_row(table, ward, area)
+    w = ward["町名"].gsub(",", "・")
+    y = ward["よみ"]
+    [
+      "#{area[:name]} #{w}(#{y})",
+      "",
+      table["可燃"] + " *1",
+      table["リプラ"] + " *2",
+      table["リプラ"] + " *3",
+      table["資源"] + " *4",
+      table["資源"] + " *5",
+      table["他プラ"] + " *6",
+      table["大型"] + " *7",
+      table["不燃"] + " *8"
+    ]
+  end
+
   def create_csv(areas, date)
     year = date.year
     rows = []
@@ -45,20 +64,7 @@ class To5374areadaysCSV
         key = ward["グループ"]
         row = garbage_table[key]
         table = Hash[row.merge(big_garbage_table[key]).map { |k,v| [k, v.join(" ")] }]
-        w = ward["町名"].gsub(",", "・")
-        y = ward["よみ"]
-        rows << [
-          "#{area[:name]} #{w}(#{y})",
-          "",
-          table["可燃"] + " *1",
-          table["リプラ"] + " *2",
-          table["リプラ"] + " *3",
-          table["資源"] + " *4",
-          table["資源"] + " *5",
-          table["他プラ"] + " *6",
-          table["大型"] + " *7",
-          table["不燃"] + " *8"
-        ]
+        rows << build_csv_row(table, ward, area)
       end
     end
     rows
