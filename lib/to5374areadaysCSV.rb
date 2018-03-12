@@ -81,7 +81,10 @@ class To5374areadaysCSV
     load_table_base(area, filename, ["大型"])
   end
 
-  def load_table_base(area, filename, gtypes)
+  # @params filename 読み込みするファイル
+  # @params gtypes このファイルで読み込みするごみの種類
+  # @return { グループkey => { ごみの種類 => [日付] }}
+  def load_table_base(filename, gtypes)
     hash = {}
     CSV.foreach(filename, encoding: 'Shift_JIS:UTF-8', headers: :first_row) do |row|
       date = Date.parse(row['年月日'])
