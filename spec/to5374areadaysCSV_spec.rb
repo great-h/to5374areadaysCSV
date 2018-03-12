@@ -3,7 +3,8 @@ require 'spec_helper'
 
 describe To5374areadaysCSV do
   let(:area) { { index: 1, name: '中区' } }
-  let(:year) { 2017 }
+  let(:date) { Date.today }
+  let(:year) { date.year }
 
   it 'has a version number' do
     expect(To5374areadaysCSV::VERSION).not_to be nil
@@ -22,7 +23,7 @@ describe To5374areadaysCSV do
   end
 
   it '#create_csv' do
-    rows = To5374areadaysCSV.new.create_csv([area])
+    rows = To5374areadaysCSV.new.create_csv([area], date)
     expect(rows[0].count).to eq(10)
   end
 end

@@ -1,16 +1,17 @@
 # coding: utf-8
 require "to5374areadaysCSV/version"
+require 'date'
 require 'csv'
 
 class To5374areadaysCSV
   FAMILY_GTYPES = ["不燃", "可燃", "リプラ", "他プラ", "資源"].freeze
 
-  def generate
+  def generate(date = Date.today())
     unless File.exist?('output')
       Dir.mkdir('output')
     end
     areas = load_areas
-    rows = create_csv(areas)
+    rows = create_csv(areas, date)
 
     output_file = CSV.open('output/area_days.csv', 'w') do |csv|
       csv << area_days_headers
@@ -33,8 +34,8 @@ class To5374areadaysCSV
     ]
   end
 
-  def create_csv(areas)
-    year = 2017
+  def create_csv(areas, date)
+    year = date.year
     rows = []
     areas.each do |area|
       garbage_table = load_garbage_table(area, year)
