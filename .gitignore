@@ -9,3 +9,4 @@
 /tmp/
 /output
 /vendor/bundle
+.DS_Store
