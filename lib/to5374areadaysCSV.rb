@@ -1,23 +1,69 @@
 # coding: utf-8
 require "to5374areadaysCSV/version"
+require "to5374areadaysCSV/ward_loader"
+require "to5374areadaysCSV/garbage_date_loader"
+require 'date'
 require 'csv'
 
-class To5374areadaysCSV
-  FAMILY_GTYPES = ["不燃", "可燃", "リプラ", "他プラ", "資源"].freeze
+module To5374areadaysCSV
+  module_function
 
-  def generate
+  def generate(date)
     unless File.exist?('output')
       Dir.mkdir('output')
     end
-    areas = load_areas
-    rows = create_csv(areas)
 
     output_file = CSV.open('output/area_days.csv', 'w') do |csv|
       csv << area_days_headers
-      rows.each do |row|
-        csv << row
+      load_areas.each do |area|
+        generate_by_area(area[:index], area[:name], date) do |row|
+          csv << row
+        end
       end
     end
+  end
+
+  def generate_by_area(area_index, area_name, date)
+    last_year = date.year-1
+    year = date.year
+    last_year_table = generate_by_year_and_area(last_year, area_index, area_name, date)
+    this_year_table = generate_by_year_and_area(year, area_index, area_name, date)
+
+    wards = WardLoader.load(date.year, area_index, area_name)
+    wards.each do |ward|
+      group_id = ward["グループ"]
+      last_year_group = last_year_table[group_id]
+      this_year_group = this_year_table[group_id]
+      group = last_year_group.map { |garbage_type, date_list|
+        [garbage_type, date_list + this_year_group[garbage_type]]
+      }.to_h
+      yield build_csv_row(group, ward)
+    end
+  end
+
+  # dateより新しいものだけにする
+  def filter_date(group_table, date)
+    group_table
+      .map { |group_id, garbage_table|
+        filtered_garbage_table = garbage_table.map { |garbage_type, date_list|
+          [garbage_type, date_list.select {|d| date < d }]
+        }.to_h
+        [group_id, filtered_garbage_table]
+      }
+      .to_h
+  end
+
+  def generate_by_year_and_area(year, area_index, area_name, date)
+    wards = WardLoader.load(year, area_index, area_name)
+    garbages_group_table = filter_date(GarbageDateLoader.load_garbage(year, area_index, area_name), date)
+    big_garbages_group_table = filter_date(GarbageDateLoader.load_big_garbage(year, area_index, area_name), date)
+
+    wards.map { |ward|
+      group_id = ward["グループ"]
+      garbage = garbages_group_table[group_id]
+      big_garbage = big_garbages_group_table[group_id]
+      [group_id, garbage.merge(big_garbage)]
+    }.to_h
   end
 
   def load_areas
@@ -33,68 +79,31 @@ class To5374areadaysCSV
     ]
   end
 
-  def create_csv(areas)
-    year = 2017
-    rows = []
-    areas.each do |area|
-      garbage_table = load_garbage_table(area, year)
-      big_garbage_table = load_big_garbage_table(area, year)
-      wards = load_wards(area, year)
-      wards.each do |ward|
-        key = ward["グループ"]
-        row = garbage_table[key]
-        table = Hash[row.merge(big_garbage_table[key]).map { |k,v| [k, v.join(" ")] }]
-        w = ward["町名"].gsub(",", "・")
-        y = ward["よみ"]
-        rows << [
-          "#{area[:name]} #{w}(#{y})",
-          "",
-          table["可燃"] + " *1",
-          table["リプラ"] + " *2",
-          table["リプラ"] + " *3",
-          table["資源"] + " *4",
-          table["資源"] + " *5",
-          table["他プラ"] + " *6",
-          table["大型"] + " *7",
-          table["不燃"] + " *8"
-        ]
-      end
+  # table: あるグループのゴミの日を保持した Hash。キーはゴミの種類 値は日付データ
+  # ward: ある街の上をう表現する Hash
+  def build_csv_row(group, ward)
+    area = ward["区"]
+    ward_name = ward["町名"].gsub(",", "・")
+    yomi = ward["よみ"]
+    row_header = "#{area} #{ward_name}(#{yomi})"
+
+    columns_order = %W'可燃 リプラ リプラ 資源 資源 他プラ 大型 不燃'
+    columns = columns_order.map.with_index do |name, index|
+      date_list = group[name].map { |n| n.strftime("%Y%m%d")}
+      (date_list + ["*#{index+1}"]).join(' ')
     end
-    rows
+    [row_header, "", *columns]
   end
 
-  def load_garbage_table(area, year)
-    filename = "resource/#{year}/1-#{area[:index]}家庭ごみ収集日（#{area[:name]}）.csv"
-    load_table_base(area, filename, FAMILY_GTYPES)
-  end
-
-  def load_big_garbage_table(area, year)
-    filename = "resource/#{year}/2-#{area[:index]}大型ごみ収集日（#{area[:name]}）.csv"
-    load_table_base(area, filename, ["大型"])
-  end
-
-  def load_table_base(area, filename, gtypes)
-    hash = {}
-    CSV.foreach(filename, encoding: 'Shift_JIS:UTF-8', headers: :first_row) do |row|
-      date = Date.parse(row['年月日'])
-      (row.headers - ['年月日', '曜']).each do |key|
-        gtype = row[key]
-        group = hash.fetch(key, {})
-        if gtype != nil
-          raise "no support gtypes: #{gtype}" unless gtypes.include? gtype
-          g_dates = group.fetch(gtype, [])
-          g_dates << date.strftime("%Y%m%d")
-          group[gtype] = g_dates
-          hash[key] = group
-        end
-      end
+  def load_year_table(area, year)
+    garbage_table = load_garbage_table(area, year)
+    big_garbage_table = load_big_garbage_table(area, year)
+    wards = load_wards(area, year)
+    wards.map do |ward|
+      key = ward["グループ"]
+      row = garbage_table[key]
+      row.merge(big_garbage_table[key])
     end
-    hash
-  end
-
-  def load_wards(area, year)
-    filename = "resource/#{year}/3-#{area[:index]}#{area[:name]}町名.csv"
-    CSV.read(filename, encoding: 'Shift_JIS:UTF-8', headers: :first_row)
   end
 
   def area_days_headers

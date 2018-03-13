@@ -1,6 +1,9 @@
 #!/usr/bin/env ruby
 $:.unshift File.join(File.dirname(__FILE__),'..', 'lib')
 
+require 'date'
 require 'to5374areadaysCSV'
 
-To5374areadaysCSV.new.generate
+today = Date.today()
+date = Date.new(today.year, today.month)
+To5374areadaysCSV.generate(date)
