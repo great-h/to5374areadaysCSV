@@ -6,12 +6,12 @@ module To5374areadaysCSV::GarbageDateLoader
   FAMILY_GTYPES = ["不燃", "可燃", "リプラ", "他プラ", "資源"].freeze
 
   def load_garbage(year, area_index, area_name)
-    filename = garbase_filename(year, area_index, area_name)
+    filename = garbage_filename(year, area_index, area_name)
     load(filename, FAMILY_GTYPES)
   end
 
-  def load_big_garbage
-    filename = big_garbase_filename(year, area_index, area_name)
+  def load_big_garbage(year, area_index, area_name)
+    filename = big_garbage_filename(year, area_index, area_name)
     load(filename, ["大型"])
   end
 
@@ -43,7 +43,7 @@ module To5374areadaysCSV::GarbageDateLoader
     end
   end
 
-  def garbase_filename(year, area_index, area_name)
+  def garbage_filename(year, area_index, area_name)
     filename = "1-#{area_index}家庭ごみ収集日（#{area_name}）.csv"
     File.join(project_root, "resource", year.to_s, filename)
   end
