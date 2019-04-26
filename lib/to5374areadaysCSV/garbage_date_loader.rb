@@ -3,7 +3,7 @@ require 'csv'
 
 module To5374areadaysCSV::GarbageDateLoader
   module_function
-  FAMILY_GTYPES = ["不燃", "可燃", "リプラ", "他プラ", "資源"].freeze
+  FAMILY_GTYPES = ["不燃", "可燃", "リプラ", "他プラ", "資源", "大型"].freeze
 
   def load_garbage(year, area_index, area_name)
     filename = garbage_filename(year, area_index, area_name)
@@ -26,7 +26,7 @@ module To5374areadaysCSV::GarbageDateLoader
         gtype = row[key]
         group = hash.fetch(key, {})
         if gtype != nil
-          raise "no support gtypes: #{gtype}" unless gtypes.include? gtype
+          raise "no support gtypes: #{gtype} in #{filename}" unless gtypes.include? gtype
           g_dates = group.fetch(gtype, [])
           g_dates << date
           group[gtype] = g_dates
