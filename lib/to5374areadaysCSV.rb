@@ -23,19 +23,33 @@ module To5374areadaysCSV
     end
   end
 
+  # yearの区のデータから区のよみからarea_tableの情報へのテーブルを作成する
+  def build_ward_group(wards, area_table)
+    wards.map do |ward| 
+      group_id = ward["グループ"]
+      ward_name = ward["よみ"]
+      group = area_table[group_id]
+      [ward_name, group]
+    end.to_h
+  end
+
+  # 区のデータを生成する
+  # 去年のデータと今年のデータからデータを構築してくっつけてあげる
   def generate_by_area(area_index, area_name, date)
     last_year = date.year-1
     year = date.year
     last_year_table = generate_by_year_and_area(last_year, area_index, area_name, date)
-    this_year_table = generate_by_year_and_area(year, area_index, area_name, date)
+    last_year_wards = WardLoader.load(last_year, area_index, area_name)
 
-    wards = WardLoader.load(date.year, area_index, area_name)
-    wards.each do |ward|
-      group_id = ward["グループ"]
-      last_year_group = last_year_table[group_id]
-      this_year_group = this_year_table[group_id]
-      group = last_year_group.map { |garbage_type, date_list|
-        [garbage_type, date_list + this_year_group[garbage_type]]
+    this_year_table = generate_by_year_and_area(year, area_index, area_name, date)
+    this_year_wards = WardLoader.load(year, area_index, area_name)
+
+    this_year_group = build_ward_group(this_year_wards, this_year_table)
+    last_year_group = build_ward_group(last_year_wards, last_year_table)
+    this_year_wards.each do |ward|
+      ward_name = ward['よみ']
+      group = this_year_group[ward_name].map { |garbage_type, date_list|
+        [garbage_type, last_year_group[ward_name][garbage_type] + date_list]
       }.to_h
       yield build_csv_row(group, ward)
     end
@@ -80,7 +94,7 @@ module To5374areadaysCSV
   end
 
   # table: あるグループのゴミの日を保持した Hash。キーはゴミの種類 値は日付データ
-  # ward: ある街の上をう表現する Hash
+  # ward: ある区の情報 Hash
   def build_csv_row(group, ward)
     area = ward["区"]
     ward_name = ward["町名"].gsub(",", "・")

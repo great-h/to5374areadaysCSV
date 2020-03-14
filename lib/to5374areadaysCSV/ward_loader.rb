@@ -1,11 +1,13 @@
 # coding: utf-8
 require 'csv'
 
+# 区データを読み出す
 module To5374areadaysCSV::WardLoader
   module_function
   
   def load(year, area_index, area_name)
     name = filename(year, area_index, area_name)
+    puts "open #{name}"
     CSV.foreach(name, encoding: 'Shift_JIS:UTF-8', headers: :first_row).map do |l|
       l.tap {
         l['区'] = area_name
