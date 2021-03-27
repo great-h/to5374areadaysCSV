@@ -48,8 +48,12 @@ module To5374areadaysCSV
     last_year_group = build_ward_group(last_year_wards, last_year_table)
     this_year_wards.each do |ward|
       ward_name = ward['よみ']
-      group = this_year_group[ward_name].map { |garbage_type, date_list|
-        [garbage_type, last_year_group[ward_name][garbage_type] + date_list]
+      ward_garbage = this_year_group[ward_name]
+      raise "「#{war_name}」のデータがありません" if ward_garbage.nil?
+      group = ward_garbage.map { |garbage_type, date_list|
+        last_ward_garabge = last_year_group[ward_name]
+        raise "去年の「#{ward_name}」のデータがありません" if last_ward_garabge.nil?
+        [garbage_type, last_ward_garabge[garbage_type] + date_list]
       }.to_h
       yield build_csv_row(group, ward)
     end
