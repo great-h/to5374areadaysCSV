@@ -4,7 +4,7 @@
 pkgs.mkShell {
   # a list of packages to add to the shell environment
   packages = with pkgs;
-    [ruby_3_1];
+    [ruby_3_4];
   # propagate all the inputs from the given derivations
   inputsFrom = [];
   # support mkDerivation attrs
