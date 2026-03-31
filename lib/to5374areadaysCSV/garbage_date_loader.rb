@@ -49,7 +49,7 @@ module To5374areadaysCSV::GarbageDateLoader
   end
 
   def big_garbage_filename(year, area_index, area_name)
-    filename = "2-#{area_index}大型ごみ収集日（#{area_name}）.csv"
+    filename = "1-#{area_index}大型ごみ収集日（#{area_name}）.csv"
     File.join(project_root, "resource", year.to_s, filename)
   end
 end
